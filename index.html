@@ -1,295 +1,317 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Nhập Pass</title>
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
-  <style>
-    /* ... (Phần CSS giữ nguyên như code thiết kế mới của bạn) ... */
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(135deg, #fce4ec 0%, #f8bbd0 100%);
-      font-family: 'Nunito', sans-serif;
-      overflow: hidden;
-    }
-    .hearts { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
-    .heart {
-      position: absolute;
-      font-size: 1.3rem;
-      opacity: 0.25;
-      animation: floatUp linear infinite;
-    }
-    @keyframes floatUp {
-      0% { transform: translateY(100vh) scale(0.6) rotate(0deg); opacity: 0.25; }
-      100% { transform: translateY(-10vh) scale(1.15) rotate(25deg); opacity: 0; }
-    }
-    .card {
-      position: relative;
-      z-index: 1;
-      background: rgba(255, 255, 255, 0.9);
-      backdrop-filter: blur(10px);
-      border-radius: 40px;
-      padding: 40px 30px;
-      width: 350px;
-      box-shadow: 0 25px 50px -12px rgba(233, 30, 140, 0.25);
-      border: 1px solid rgba(255, 255, 255, 0.4);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      animation: popIn 0.6s cubic-bezier(.34,1.56,.64,1) both;
-    }
-    @keyframes popIn {
-      from { transform: scale(0.9) translateY(40px); opacity: 0; }
-      to { transform: scale(1) translateY(0); opacity: 1; }
-    }
-    .title {
-      font-size: 1.2rem;
-      font-weight: 800;
-      color: #ad1457;
-      margin-bottom: 20px;
-      text-align: center;
-      letter-spacing: -0.5px;
-    }
-    .avatar-wrapper {
-      width: 100px;
-      height: 100px;
-      margin-bottom: 25px;
-      position: relative;
-    }
-    .avatar-wrapper::after {
-      content: '';
-      position: absolute;
-      inset: -5px;
-      border-radius: 50%;
-      border: 2px dashed #f48fb1;
-      animation: rotate 10s linear infinite;
-    }
-    @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-    .avatar {
-      width: 100%;
-      height: 100%;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 4px solid #fff;
-      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-      position: relative;
-      z-index: 2;
-    }
-    .pass-input {
-      width: 100%;
-      padding: 15px;
-      border: 2px solid #fce4ec;
-      border-radius: 20px;
-      font-size: 1.5rem;
-      color: #880e4f;
-      background: #fff;
-      outline: none;
-      letter-spacing: 8px;
-      text-align: center;
-      margin-bottom: 25px;
-      transition: all 0.3s ease;
-    }
-    .pass-input:focus {
-      border-color: #f06292;
-      box-shadow: 0 0 15px rgba(240, 98, 146, 0.1);
-    }
-    .numpad {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 15px;
-      width: 100%;
-      margin-bottom: 15px;
-    }
-    .btn {
-      height: 65px;
-      border: none;
-      border-radius: 20px;
-      font-family: 'Nunito', sans-serif;
-      font-size: 1.5rem;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .btn-num {
-      background: #ffffff;
-      color: #ad1457;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.02), inset 0 -4px 0 rgba(244, 143, 177, 0.2);
-    }
-    .btn-num:hover {
-      background: #fff8fa;
-      transform: translateY(-2px);
-      box-shadow: 0 6px 12px rgba(244, 143, 177, 0.3);
-    }
-    .btn-num:active { transform: translateY(2px); box-shadow: none; }
-    .bottom-row { display: flex; gap: 15px; width: 100%; margin-bottom: 25px; }
-    .btn-zero { flex: 2; }
-    .btn-delete { 
-      flex: 1; 
-      background: #f8bbd0; 
-      color: #ad1457;
-      font-size: 1.2rem;
-    }
-    .confirm-wrap { width: 100%; }
-    .btn-confirm {
-      width: 100%;
-      height: 60px;
-      border-radius: 20px;
-      background: linear-gradient(135deg, #ec407a 0%, #d81b60 100%);
-      border: none;
-      color: white;
-      font-size: 1.5rem;
-      cursor: pointer;
-      box-shadow: 0 10px 20px rgba(216, 27, 96, 0.3);
-      transition: all 0.3s ease;
-    }
-    .btn-confirm:hover {
-      transform: scale(1.02);
-      box-shadow: 0 12px 25px rgba(216, 27, 96, 0.4);
-    }
-    .overlay {
-      display: none;
-      position: fixed; inset: 0; z-index: 100;
-      background: rgba(255, 255, 255, 0.9);
-      backdrop-filter: blur(15px);
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      animation: fadeIn 0.4s ease;
-    }
-    .overlay.show { display: flex; }
-    .overlay-avatar {
-      width: 130px; height: 130px;
-      border-radius: 50%;
-      padding: 5px;
-      background: linear-gradient(45deg, #f06292, #ad1457);
-      margin-bottom: 20px;
-    }
-    .overlay-avatar img { width: 100%; height: 100%; border-radius: 50%; border: 4px solid #fff; object-fit: cover;}
-    .overlay-text { font-size: 2rem; font-weight: 900; color: #ad1457; margin-bottom: 10px; }
-    .overlay-hint { color: #f06292; font-weight: 600; cursor: pointer; text-decoration: underline; }
-    .pass-input.shake { animation: shake 0.4s ease; border-color: #ff5252; }
-    @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      25% { transform: translateX(-8px); }
-      75% { transform: translateX(8px); }
-    }
-  </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <title>Xác Nhận Truy Cập</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+    <style>
+        :root {
+            --primary: #ff4d94;
+            --primary-dark: #d81b60;
+            --bg-gradient: linear-gradient(135deg, #fff5f7 0%, #ffd1dc 100%);
+            --glass: rgba(255, 255, 255, 0.75);
+            --shadow: 0 20px 40px rgba(255, 77, 148, 0.2);
+        }
+
+        *, *::before, *::after { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+            -webkit-tap-highlight-color: transparent; /* Tắt vệt xanh khi chạm trên Mobile */
+        }
+
+        body {
+            min-height: 100vh;
+            min-height: -webkit-fill-available; /* Sửa lỗi chiều cao trên trình duyệt Safari iOS */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-gradient);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            overflow: hidden;
+            padding: 20px;
+        }
+
+        /* Floating Hearts */
+        .hearts { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+        .heart {
+            position: absolute;
+            font-size: 1.5rem;
+            filter: drop-shadow(0 2px 5px rgba(255, 77, 148, 0.3));
+            animation: floatUp linear infinite;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(110vh) scale(0.5) rotate(0deg); opacity: 0; }
+            20% { opacity: 0.6; }
+            100% { transform: translateY(-10vh) scale(1.2) rotate(45deg); opacity: 0; }
+        }
+
+        /* Main Card */
+        .card {
+            position: relative;
+            z-index: 1;
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 32px;
+            padding: 2.5rem 1.5rem;
+            width: 100%;
+            max-width: 380px; /* Độ rộng tối đa trên Desktop */
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            text-align: center;
+            animation: cardEntrance 0.8s cubic-bezier(.2, .8, .2, 1);
+        }
+
+        @keyframes cardEntrance {
+            from { transform: scale(0.9) translateY(30px); opacity: 0; }
+            to { transform: scale(1) translateY(0); opacity: 1; }
+        }
+
+        .title {
+            font-size: clamp(1.1rem, 5vw, 1.4rem); /* Chữ tự co giãn theo màn hình */
+            font-weight: 800;
+            color: #4a001f;
+            margin-bottom: 20px;
+        }
+
+        /* Avatar Section */
+        .avatar-container {
+            position: relative;
+            width: clamp(80px, 20vw, 110px);
+            height: clamp(80px, 20vw, 110px);
+            margin: 0 auto 25px;
+        }
+
+        .avatar-ring {
+            position: absolute;
+            inset: -6px;
+            border: 2px solid var(--primary);
+            border-radius: 50%;
+            border-top-color: transparent;
+            border-bottom-color: transparent;
+            animation: spin 4s linear infinite;
+        }
+
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        .avatar {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #fff;
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+        }
+
+        /* Input Styling */
+        .pass-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.6);
+            border: 2px solid rgba(255, 77, 148, 0.1);
+            border-radius: 16px;
+            padding: 12px;
+            font-size: 1.8rem;
+            color: var(--primary-dark);
+            text-align: center;
+            letter-spacing: 10px;
+            outline: none;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        /* Numpad Styling */
+        .numpad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .btn {
+            height: clamp(50px, 12vw, 65px); /* Nút to hơn trên Mobile để dễ bấm */
+            border: none;
+            border-radius: 16px;
+            font-family: inherit;
+            font-size: 1.4rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            color: #4a001f;
+            box-shadow: 0 4px 0 rgba(255, 77, 148, 0.1);
+        }
+
+        .btn:active { transform: translateY(2px); box-shadow: none; }
+
+        .btn-action { background: rgba(255, 77, 148, 0.1); color: var(--primary); }
+        
+        .btn-confirm {
+            grid-column: span 3;
+            height: 60px;
+            margin-top: 10px;
+            background: linear-gradient(135deg, #ff4d94 0%, #ff1a75 100%);
+            color: white;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 10px 20px rgba(255, 26, 117, 0.3);
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 360px) {
+            .card { padding: 1.5rem 1rem; }
+            .numpad { gap: 8px; }
+            .btn { height: 50px; border-radius: 12px; }
+        }
+
+        /* Success Overlay */
+        .overlay {
+            display: none;
+            position: fixed; inset: 0; z-index: 100;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            text-align: center;
+        }
+        .overlay.show { display: flex; }
+        .success-icon {
+            width: 80px; height: 80px;
+            background: #4caf50;
+            color: white;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2.5rem; margin-bottom: 20px;
+            animation: pop 0.5s cubic-bezier(.17, .89, .32, 1.49);
+        }
+
+        @keyframes pop { from { transform: scale(0); } to { transform: scale(1); } }
+        .shake { animation: shake 0.4s ease-in-out; }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+    </style>
 </head>
 <body>
 
 <div class="hearts" id="hearts"></div>
 
 <div class="card">
-  <div class="title">Nhập Pass Đi Người Đẹp</div>
-  
-  <div class="avatar-wrapper">
-    <img src="avatarnts.jpg" alt="Nguyễn Thanh Sang" class="avatar">
-  </div>
+    <div class="title">Xác minh quyền truy cập</div>
+    
+    <div class="avatar-container">
+        <div class="avatar-ring"></div>
+        <img src="avatarnts.jpg" alt="User" class="avatar">
+    </div>
 
-  <input class="pass-input" id="passInput" type="password" placeholder="••••••••" readonly maxlength="8"/>
-  
-  <div class="numpad" id="numpad">
-    <button class="btn btn-num" data-val="1">1</button>
-    <button class="btn btn-num" data-val="2">2</button>
-    <button class="btn btn-num" data-val="3">3</button>
-    <button class="btn btn-num" data-val="4">4</button>
-    <button class="btn btn-num" data-val="5">5</button>
-    <button class="btn btn-num" data-val="6">6</button>
-    <button class="btn btn-num" data-val="7">7</button>
-    <button class="btn btn-num" data-val="8">8</button>
-    <button class="btn btn-num" data-val="9">9</button>
-  </div>
-  
-  <div class="bottom-row">
-    <button class="btn btn-num btn-zero" data-val="0">0</button>
-    <button class="btn btn-delete" id="deleteBtn">✕</button>
-  </div>
-  
-  <div class="confirm-wrap">
-    <button class="btn-confirm" id="confirmBtn">Unlock</button>
-  </div>
+    <input class="pass-input" id="passInput" type="password" placeholder="••••" readonly maxlength="8"/>
+    
+    <div class="numpad">
+        <button class="btn" data-val="1">1</button>
+        <button class="btn" data-val="2">2</button>
+        <button class="btn" data-val="3">3</button>
+        <button class="btn" data-val="4">4</button>
+        <button class="btn" data-val="5">5</button>
+        <button class="btn" data-val="6">6</button>
+        <button class="btn" data-val="7">7</button>
+        <button class="btn" data-val="8">8</button>
+        <button class="btn" data-val="9">9</button>
+        <button class="btn btn-action" id="clearBtn">C</button>
+        <button class="btn" data-val="0">0</button>
+        <button class="btn btn-action" id="deleteBtn">⌫</button>
+        <button class="btn btn-confirm" id="confirmBtn">Mở khóa</button>
+    </div>
 </div>
 
 <div class="overlay" id="overlay">
-  <div class="overlay-avatar">
-    <img src="avatarnts.jpg" alt="Nguyễn Thanh Sang">
-  </div>
-  <div class="overlay-text">xác minh thành công xin chờ 1 xiu....</div>
+    <div class="success-icon">✓</div>
+    <div class="title" style="color: #2e7d32">Thành công!</div>
+    <p style="color: #666;">Đang chuyển hướng vui lòng đợi...</p>
 </div>
 
 <script>
-  // ... (Phần logic trái tim và nút bấm giữ nguyên) ...
-  const heartsEl = document.getElementById('hearts');
-  const heartChars = ['♥','❤','💕','💗','💓','✿','🌷'];
-  for (let i = 0; i < 24; i++) {
-    const h = document.createElement('span');
-    h.className = 'heart';
-    h.textContent = heartChars[Math.floor(Math.random() * heartChars.length)];
-    h.style.left = Math.random() * 100 + 'vw';
-    h.style.animationDuration = (4 + Math.random() * 10) + 's';
-    h.style.animationDelay = (Math.random() * 10) + 's';
-    h.style.fontSize = (0.9 + Math.random() * 1.4) + 'rem';
-    heartsEl.appendChild(h);
-  }
-
-  const CORRECT = '1234'; // ← Đổi mật khẩu ở đây
-  const input = document.getElementById('passInput');
-  let value = '';
-
-  document.getElementById('numpad').addEventListener('click', e => {
-    const btn = e.target.closest('[data-val]');
-    if (!btn) return;
-    if (value.length < 8) {
-      value += btn.dataset.val;
-      input.value = value;
+    // Tự động tạo tim bay ngẫu nhiên
+    const heartsEl = document.getElementById('hearts');
+    const heartChars = ['❤','💖','✨','🌸'];
+    function createHeart() {
+        const h = document.createElement('span');
+        h.className = 'heart';
+        h.textContent = heartChars[Math.floor(Math.random() * heartChars.length)];
+        h.style.left = Math.random() * 100 + 'vw';
+        h.style.animationDuration = (3 + Math.random() * 5) + 's';
+        h.style.opacity = Math.random() * 0.5 + 0.3;
+        heartsEl.appendChild(h);
+        setTimeout(() => h.remove(), 6000);
     }
-  });
+    setInterval(createHeart, 500);
 
-  document.getElementById('deleteBtn').addEventListener('click', () => {
-    value = value.slice(0, -1);
-    input.value = value;
-  });
+    // Xử lý Logic Passcode
+    const CORRECT = '1234'; // Đổi mật khẩu của bạn tại đây
+    const input = document.getElementById('passInput');
+    let value = '';
 
-  document.getElementById('confirmBtn').addEventListener('click', checkPass);
+    // Lắng nghe sự kiện click cho các nút số
+    document.querySelectorAll('.btn[data-val]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            if (value.length < 8) {
+                value += btn.dataset.val;
+                input.value = value;
+            }
+        });
+    });
 
-  // HÀM KIỂM TRA VÀ CHUYỂN TRANG
-  function checkPass() {
-    if (value === CORRECT) {
-      // Hiện hiệu ứng chúc mừng
-      document.getElementById('overlay').classList.add('show');
-      
-      // Chuyển hướng sau 1.2 giây
-      setTimeout(() => {
-        window.location.href = "lich.html"; // THAY ĐỔI ĐỊA CHỈ TRANG BẠN MUỐN TỚI Ở ĐÂY
-      }, 1200);
-      
-    } else {
-      input.classList.add('shake');
-      setTimeout(() => {
-        input.classList.remove('shake');
+    // Nút xóa từng số
+    document.getElementById('deleteBtn').addEventListener('click', () => {
+        value = value.slice(0, -1);
+        input.value = value;
+    });
+
+    // Nút xóa tất cả
+    document.getElementById('clearBtn').addEventListener('click', () => {
         value = '';
         input.value = '';
-      }, 400);
-    }
-  }
+    });
 
-  document.addEventListener('keydown', e => {
-    if (e.key >= '0' && e.key <= '9') { 
-      if (value.length < 8) { value += e.key; input.value = value; } 
+    // Kiểm tra mật khẩu
+    function checkPass() {
+        if (value === CORRECT) {
+            document.getElementById('overlay').classList.add('show');
+            setTimeout(() => {
+                window.location.href = "lich.html";
+            }, 1200);
+        } else {
+            input.classList.add('shake');
+            input.style.color = '#ff5252';
+            setTimeout(() => {
+                input.classList.remove('shake');
+                input.style.color = '';
+                value = '';
+                input.value = '';
+            }, 500);
+        }
     }
-    else if (e.key === 'Backspace') { 
-      value = value.slice(0,-1); input.value = value; 
-    }
-    else if (e.key === 'Enter') checkPass();
-  });
+
+    document.getElementById('confirmBtn').addEventListener('click', checkPass);
+
+    // Hỗ trợ bàn phím máy tính
+    document.addEventListener('keydown', e => {
+        if (e.key >= '0' && e.key <= '9') {
+            if (value.length < 8) { value += e.key; input.value = value; }
+        } else if (e.key === 'Backspace') {
+            value = value.slice(0,-1); input.value = value;
+        } else if (e.key === 'Enter') {
+            checkPass();
+        }
+    });
 </script>
 </body>
 </html>
