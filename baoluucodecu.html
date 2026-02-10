@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>Happy Valentine ♥</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Montserrat:wght@500;600&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  
+  <style>
+    :root {
+      --primary-pink: #ff4d8d;
+      --soft-pink: #ff85a1;
+      --bg-gradient: linear-gradient(135deg, #fce4ec 0%, #ffd1dc 100%);
+      --glass-white: rgba(255, 255, 255, 0.9);
+      
+      /* Cấu hình Font */
+      --font-display: 'Dancing Script', cursive;
+      --font-main: 'Quicksand', sans-serif;
+      --font-ui: 'Montserrat', sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      background: var(--bg-gradient);
+      font-family: var(--font-main); /* Áp dụng font chính cho toàn bộ trang */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #880e4f;
+      overflow-x: hidden;
+      padding: 20px;
+    }
+
+    #heart-bg {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .card {
+      background: var(--glass-white);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      width: 100%;
+      max-width: 450px;
+      padding: clamp(25px, 6vw, 45px);
+      border-radius: 35px;
+      box-shadow: 0 20px 45px rgba(255, 77, 141, 0.2);
+      text-align: center;
+      position: relative;
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      z-index: 10;
+      animation: fadeIn 0.8s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h1 {
+      font-family: var(--font-display); /* Font viết tay */
+      font-size: clamp(2.5rem, 10vw, 3.5rem);
+      color: var(--primary-pink);
+      margin: 0 0 20px;
+      text-shadow: 2px 2px 4px rgba(255, 77, 141, 0.1);
+    }
+
+    .calendar-container {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      margin-bottom: 25px;
+    }
+
+    .calendar {
+      width: 100%;
+      max-width: 320px;
+      background: white;
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 10px 25px rgba(255, 77, 141, 0.1);
+      font-family: var(--font-ui); /* Font hiện đại cho lịch */
+    }
+
+    .month-title {
+      background: var(--primary-pink);
+      color: white;
+      padding: 15px;
+      font-size: 1.2rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
+
+    th {
+      background: #fff8f9;
+      color: var(--soft-pink);
+      padding: 12px 0;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    td {
+      padding: 14px 0;
+      font-size: 1rem;
+      color: #5d4037;
+      font-weight: 500;
+      position: relative;
+    }
+
+    .heart-day {
+      color: var(--primary-pink);
+      font-weight: 700;
+      cursor: pointer;
+      z-index: 2;
+    }
+
+    .heart-day::after {
+      content: '❤';
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 2.2rem;
+      color: rgba(255, 77, 141, 0.15);
+      z-index: -1;
+    }
+
+    .bottom-text {
+      font-size: clamp(1rem, 4vw, 1.2rem);
+      font-weight: 600;
+      color: #ad1457;
+      margin-top: 20px;
+    }
+
+    .bottom-text span {
+      display: inline-block;
+      margin-top: 10px;
+      font-size: 1.8rem;
+      animation: heartbeat 1.2s infinite;
+    }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 2000;
+      left: 0; top: 0; width: 100%; height: 100%;
+      background: rgba(136, 14, 79, 0.3);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      justify-content: center;
+      align-items: center;
+      padding: 15px;
+    }
+
+    .modal-content {
+      background: white;
+      padding: clamp(30px, 8vw, 45px);
+      border-radius: 35px;
+      width: 100%;
+      max-width: 420px;
+      text-align: center;
+      position: relative;
+      box-shadow: 0 30px 60px rgba(0,0,0,0.15);
+    }
+
+    .close {
+      position: absolute;
+      top: 15px; right: 20px;
+      font-size: 24px;
+      color: #bbb;
+      cursor: pointer;
+      transition: color 0.3s;
+    }
+
+    .close:hover { color: var(--primary-pink); }
+
+    .modal h2 {
+      font-family: var(--font-display);
+      color: var(--primary-pink);
+      font-size: clamp(2.2rem, 7vw, 2.8rem);
+      margin: 0 0 20px;
+    }
+
+    #typed-text {
+      font-family: var(--font-main);
+      font-weight: 600;
+      color: #4e342e;
+      line-height: 1.8;
+      font-size: 1.1rem;
+      text-align: left;
+      min-height: 100px;
+    }
+
+    @keyframes heartbeat {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.3); }
+    }
+  </style>
+</head>
+<body>
+
+<div id="heart-bg"></div>
+
+<div class="card">
+  <h1>Happy Valentine</h1>
+
+  <div class="calendar-container">
+    <div class="calendar">
+      <div class="month-title">February 2026</div>
+      <table>
+        <thead>
+          <tr>
+            <th>Sun</th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td></td><td></td><td></td><td></td><td></td><td>1</td><td>2</td></tr>
+          <tr><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td></tr>
+          <tr><td>10</td><td>11</td><td>12</td><td>13</td><td class="heart-day" id="valentine-day">14</td><td>15</td><td>16</td></tr>
+          <tr><td>17</td><td>18</td><td>19</td><td>20</td><td>21</td><td>22</td><td>23</td></tr>
+          <tr><td>24</td><td>25</td><td>26</td><td>27</td><td>28</td><td></td><td></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="bottom-text">
+    Chạm vào ngày Valentine nè
+    <br>
+    <span>❤</span>
+  </div>
+</div>
+
+<div id="myModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>Gửi người anh yêu...</h2>
+    <div id="typed-text"></div>
+  </div>
+</div>
+
+<script>
+function createHeart() {
+  const container = document.getElementById('heart-bg');
+  const heart = document.createElement('div');
+  heart.innerHTML = '❤';
+  heart.style.cssText = `
+    position: absolute;
+    left: ${Math.random() * 100}vw;
+    top: 100vh;
+    font-size: ${Math.random() * 15 + 10}px;
+    color: rgba(255, 77, 141, ${Math.random() * 0.3 + 0.1});
+    user-select: none;
+    animation: floatUp ${Math.random() * 4 + 5}s linear forwards;
+  `;
+  container.appendChild(heart);
+  setTimeout(() => heart.remove(), 9000);
+}
+
+const style = document.createElement('style');
+style.innerHTML = `
+  @keyframes floatUp {
+    to { transform: translateY(-110vh) rotate(360deg); opacity: 0; }
+  }
+`;
+document.head.appendChild(style);
+setInterval(createHeart, 500);
+
+const modal = document.getElementById("myModal");
+const valentineDay = document.getElementById("valentine-day");
+const closeBtn = document.querySelector(".close");
+const textElement = document.getElementById("typed-text");
+
+let i = 0;
+const message = "Chào bé yêu,\n\nValentine năm nay anh chỉ muốn gửi đến em ngàn lời yêu thương nhất. Cảm ơn em đã xuất hiện và làm thế giới của anh trở nên rực rỡ.\n\nChúc em luôn xinh đẹp, hạnh phúc và mãi ở bên cạnh anh nhé! Yêu em nhiều nhất! ♥";
+
+valentineDay.onclick = () => {
+  modal.style.display = "flex";
+  if(i === 0) typeWriter();
+}
+
+closeBtn.onclick = closeModal;
+window.onclick = (e) => { if(e.target == modal) closeModal(); }
+
+function closeModal() {
+  modal.style.display = "none";
+  textElement.innerHTML = "";
+  i = 0;
+}
+
+function typeWriter() {
+  if (i < message.length) {
+    textElement.innerHTML += message.charAt(i) === '\n' ? '<br>' : message.charAt(i);
+    i++;
+    setTimeout(typeWriter, 40);
+  }
+}
+</script>
+
+</body>
+</html>
