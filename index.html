@@ -13,17 +13,15 @@
             --glass: rgba(255, 255, 255, 0.75);
             --shadow: 0 20px 40px rgba(255, 77, 148, 0.2);
         }
-
-        *, *::before, *::after { 
-            box-sizing: border-box; 
-            margin: 0; 
-            padding: 0; 
-            -webkit-tap-highlight-color: transparent; /* Tắt vệt xanh khi chạm trên Mobile */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
         }
-
         body {
             min-height: 100vh;
-            min-height: -webkit-fill-available; /* Sửa lỗi chiều cao trên trình duyệt Safari iOS */
+            min-height: -webkit-fill-available;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -32,8 +30,6 @@
             overflow: hidden;
             padding: 20px;
         }
-
-        /* Floating Hearts */
         .hearts { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
         .heart {
             position: absolute;
@@ -41,14 +37,11 @@
             filter: drop-shadow(0 2px 5px rgba(255, 77, 148, 0.3));
             animation: floatUp linear infinite;
         }
-
         @keyframes floatUp {
             0% { transform: translateY(110vh) scale(0.5) rotate(0deg); opacity: 0; }
             20% { opacity: 0.6; }
             100% { transform: translateY(-10vh) scale(1.2) rotate(45deg); opacity: 0; }
         }
-
-        /* Main Card */
         .card {
             position: relative;
             z-index: 1;
@@ -58,33 +51,28 @@
             border-radius: 32px;
             padding: 2.5rem 1.5rem;
             width: 100%;
-            max-width: 380px; /* Độ rộng tối đa trên Desktop */
+            max-width: 380px;
             box-shadow: var(--shadow);
             border: 1px solid rgba(255, 255, 255, 0.8);
             text-align: center;
             animation: cardEntrance 0.8s cubic-bezier(.2, .8, .2, 1);
         }
-
         @keyframes cardEntrance {
             from { transform: scale(0.9) translateY(30px); opacity: 0; }
             to { transform: scale(1) translateY(0); opacity: 1; }
         }
-
         .title {
-            font-size: clamp(1.1rem, 5vw, 1.4rem); /* Chữ tự co giãn theo màn hình */
+            font-size: clamp(1.1rem, 5vw, 1.4rem);
             font-weight: 800;
             color: #4a001f;
             margin-bottom: 20px;
         }
-
-        /* Avatar Section */
         .avatar-container {
             position: relative;
             width: clamp(80px, 20vw, 110px);
             height: clamp(80px, 20vw, 110px);
             margin: 0 auto 25px;
         }
-
         .avatar-ring {
             position: absolute;
             inset: -6px;
@@ -94,9 +82,7 @@
             border-bottom-color: transparent;
             animation: spin 4s linear infinite;
         }
-
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-
         .avatar {
             width: 100%;
             height: 100%;
@@ -105,8 +91,6 @@
             border: 4px solid #fff;
             box-shadow: 0 8px 15px rgba(0,0,0,0.1);
         }
-
-        /* Input Styling */
         .pass-input {
             width: 100%;
             background: rgba(255, 255, 255, 0.6);
@@ -121,17 +105,14 @@
             margin-bottom: 20px;
             transition: all 0.3s ease;
         }
-
-        /* Numpad Styling */
         .numpad {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 12px;
             margin-bottom: 15px;
         }
-
         .btn {
-            height: clamp(50px, 12vw, 65px); /* Nút to hơn trên Mobile để dễ bấm */
+            height: clamp(50px, 12vw, 65px);
             border: none;
             border-radius: 16px;
             font-family: inherit;
@@ -146,11 +127,8 @@
             color: #4a001f;
             box-shadow: 0 4px 0 rgba(255, 77, 148, 0.1);
         }
-
         .btn:active { transform: translateY(2px); box-shadow: none; }
-
         .btn-action { background: rgba(255, 77, 148, 0.1); color: var(--primary); }
-        
         .btn-confirm {
             grid-column: span 3;
             height: 60px;
@@ -162,15 +140,11 @@
             letter-spacing: 1px;
             box-shadow: 0 10px 20px rgba(255, 26, 117, 0.3);
         }
-
-        /* Responsive Adjustments */
         @media (max-width: 360px) {
             .card { padding: 1.5rem 1rem; }
             .numpad { gap: 8px; }
             .btn { height: 50px; border-radius: 12px; }
         }
-
-        /* Success Overlay */
         .overlay {
             display: none;
             position: fixed; inset: 0; z-index: 100;
@@ -191,7 +165,6 @@
             font-size: 2.5rem; margin-bottom: 20px;
             animation: pop 0.5s cubic-bezier(.17, .89, .32, 1.49);
         }
-
         @keyframes pop { from { transform: scale(0); } to { transform: scale(1); } }
         .shake { animation: shake 0.4s ease-in-out; }
         @keyframes shake {
@@ -202,19 +175,16 @@
     </style>
 </head>
 <body>
-
 <div class="hearts" id="hearts"></div>
-
 <div class="card">
     <div class="title">Xác minh quyền truy cập</div>
-    
+   
     <div class="avatar-container">
         <div class="avatar-ring"></div>
         <img src="avatarnts.jpg" alt="User" class="avatar">
     </div>
-
     <input class="pass-input" id="passInput" type="password" placeholder="••••" readonly maxlength="8"/>
-    
+   
     <div class="numpad">
         <button class="btn" data-val="1">1</button>
         <button class="btn" data-val="2">2</button>
@@ -231,7 +201,6 @@
         <button class="btn btn-confirm" id="confirmBtn">Mở khóa</button>
     </div>
 </div>
-
 <div class="overlay" id="overlay">
     <div class="success-icon">✓</div>
     <div class="title" style="color: #2e7d32">Thành công!</div>
@@ -255,11 +224,10 @@
     setInterval(createHeart, 500);
 
     // Xử lý Logic Passcode
-    const CORRECT = '1234'; // Đổi mật khẩu của bạn tại đây
+    const CORRECT = '270126'; // Mật khẩu đã được thay đổi
     const input = document.getElementById('passInput');
     let value = '';
 
-    // Lắng nghe sự kiện click cho các nút số
     document.querySelectorAll('.btn[data-val]').forEach(btn => {
         btn.addEventListener('click', () => {
             if (value.length < 8) {
@@ -269,19 +237,16 @@
         });
     });
 
-    // Nút xóa từng số
     document.getElementById('deleteBtn').addEventListener('click', () => {
         value = value.slice(0, -1);
         input.value = value;
     });
 
-    // Nút xóa tất cả
     document.getElementById('clearBtn').addEventListener('click', () => {
         value = '';
         input.value = '';
     });
 
-    // Kiểm tra mật khẩu
     function checkPass() {
         if (value === CORRECT) {
             document.getElementById('overlay').classList.add('show');
@@ -302,12 +267,15 @@
 
     document.getElementById('confirmBtn').addEventListener('click', checkPass);
 
-    // Hỗ trợ bàn phím máy tính
     document.addEventListener('keydown', e => {
         if (e.key >= '0' && e.key <= '9') {
-            if (value.length < 8) { value += e.key; input.value = value; }
+            if (value.length < 8) { 
+                value += e.key; 
+                input.value = value; 
+            }
         } else if (e.key === 'Backspace') {
-            value = value.slice(0,-1); input.value = value;
+            value = value.slice(0,-1); 
+            input.value = value;
         } else if (e.key === 'Enter') {
             checkPass();
         }
