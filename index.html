@@ -178,13 +178,13 @@
 <div class="hearts" id="hearts"></div>
 <div class="card">
     <div class="title">Xác minh quyền truy cập</div>
-   
+  
     <div class="avatar-container">
         <div class="avatar-ring"></div>
         <img src="avatar.jpg" alt="User" class="avatar">
     </div>
-    <input class="pass-input" id="passInput" type="password" placeholder="••••" readonly maxlength="8"/>
-   
+    <input class="pass-input" id="passInput" type="password" placeholder="••••••" readonly maxlength="8"/>
+  
     <div class="numpad">
         <button class="btn" data-val="1">1</button>
         <button class="btn" data-val="2">2</button>
@@ -202,7 +202,10 @@
     </div>
 </div>
 <div class="overlay" id="overlay">
-    <div class="success-icon">✓</div>
+    <div class="avatar-container">
+        <div class="avatar-ring"></div>
+        <img src="avatar.jpg" alt="User" class="avatar">
+    </div>
     <div class="title" style="color: #2e7d32">Thành công!</div>
     <p style="color: #666;">Đang chuyển hướng vui lòng đợi...</p>
 </div>
@@ -224,7 +227,7 @@
     setInterval(createHeart, 500);
 
     // Xử lý Logic Passcode
-    const CORRECT = '270126'; // Mật khẩu đã được thay đổi
+    const CORRECT = '270126';
     const input = document.getElementById('passInput');
     let value = '';
 
@@ -269,12 +272,12 @@
 
     document.addEventListener('keydown', e => {
         if (e.key >= '0' && e.key <= '9') {
-            if (value.length < 8) { 
-                value += e.key; 
-                input.value = value; 
+            if (value.length < 8) {
+                value += e.key;
+                input.value = value;
             }
         } else if (e.key === 'Backspace') {
-            value = value.slice(0,-1); 
+            value = value.slice(0,-1);
             input.value = value;
         } else if (e.key === 'Enter') {
             checkPass();
