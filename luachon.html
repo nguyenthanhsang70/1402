@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Valentine Surprise 💖</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Quicksand:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #ff4e8a;
+            --glass: rgba(255, 255, 255, 0.2);
+            --border: rgba(255, 255, 255, 0.4);
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Quicksand', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: var(--primary);
+        }
+
+        /* Nền Gradient Động */
+        .background {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            background: linear-gradient(-45deg, #ff4e8a, #ff9dcf, #ff6fa5, #fb4481);
+            background-size: 400% 400%;
+            animation: meshGradient 12s ease infinite;
+        }
+
+        @keyframes meshGradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Khung chứa chính (Responsive Container) */
+        .container {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            background: var(--glass);
+            padding: 2.5rem;
+            width: 90%;
+            max-width: 600px; /* Giới hạn độ rộng trên desktop */
+            border-radius: 2rem;
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid var(--border);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            margin: 1rem;
+        }
+
+        h1 {
+            font-family: 'Dancing Script', cursive;
+            font-size: clamp(2rem, 8vw, 3.5rem); /* Tự co giãn theo màn hình */
+            color: white;
+            margin: 0 0 2rem 0;
+            line-height: 1.2;
+            text-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        .gifts {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap; /* Tự xuống dòng trên di động */
+        }
+
+        .gift {
+            font-size: clamp(4rem, 15vw, 6.5rem); /* Co giãn linh hoạt */
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: inline-block;
+            filter: drop-shadow(0 10px 10px rgba(0,0,0,0.1));
+        }
+
+        /* Hiệu ứng Desktop */
+        @media (hover: hover) {
+            .gift:hover {
+                transform: scale(1.2) translateY(-15px) rotate(10deg);
+                filter: drop-shadow(0 20px 30px rgba(255,255,255,0.4));
+            }
+        }
+
+        /* Hiệu ứng Mobile (Click/Touch) */
+        .gift:active {
+            transform: scale(0.9);
+        }
+
+        p {
+            margin-top: 2rem;
+            color: white;
+            font-size: clamp(0.9rem, 3vw, 1.1rem);
+            font-weight: 500;
+            opacity: 0.95;
+        }
+
+        /* Hạt Bokeh */
+        .particle {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.25);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Tim bay */
+        .heart-float {
+            position: fixed;
+            pointer-events: none;
+            z-index: 2;
+            animation: floatUp linear forwards;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(0) scale(0); opacity: 0; }
+            20% { opacity: 1; transform: translateY(-10vh) scale(1.2); }
+            100% { transform: translateY(-110vh) scale(0.8) rotate(360deg); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="background"></div>
+
+    <div class="container">
+        <h1>Hãy Chọn Một Hộp Quà</h1>
+        <div class="gifts">
+            <div class="gift" onclick="openGift('gift1.html')">🎁</div>
+            <div class="gift" onclick="openGift('gift2.html')">🎁</div>
+            <div class="gift" onclick="openGift('gift3.html')">🎁</div>
+        </div>
+        <p>Chạm vào một hộp quà để mở nhé </p>
+    </div>
+
+    <script>
+        // Xử lý chuyển trang mượt
+        function openGift(url) {
+            const container = document.querySelector('.container');
+            container.style.pointerEvents = "none";
+            container.style.transition = "0.8s cubic-bezier(0.6, -0.28, 0.735, 0.045)";
+            container.style.opacity = "0";
+            container.style.transform = "scale(0.5) rotate(-5deg)";
+            
+            setTimeout(() => {
+                window.location.href = url;
+            }, 750);
+        }
+
+        // Tạo hạt Bokeh (Giảm số lượng trên Mobile để tối ưu hiệu năng)
+        function createParticles() {
+            const isMobile = window.innerWidth < 768;
+            const count = isMobile ? 10 : 25;
+            
+            for (let i = 0; i < count; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                const size = Math.random() * (isMobile ? 30 : 60) + 10;
+                particle.style.width = size + 'px';
+                particle.style.height = size + 'px';
+                particle.style.left = Math.random() * 100 + 'vw';
+                particle.style.top = Math.random() * 100 + 'vh';
+                
+                document.body.appendChild(particle);
+                
+                animateParticle(particle);
+            }
+        }
+
+        function animateParticle(el) {
+            setInterval(() => {
+                const x = (Math.random() - 0.5) * 40;
+                const y = (Math.random() - 0.5) * 40;
+                el.style.transition = "8s ease-in-out";
+                el.style.transform = `translate(${x}px, ${y}px)`;
+            }, 8000);
+        }
+
+        // Tạo hiệu ứng tim bay
+        function createHeart() {
+            const heart = document.createElement('div');
+            heart.className = 'heart-float';
+            const icons = ['❤', '💖', '🌸', '✨', '💕'];
+            heart.innerHTML = icons[Math.floor(Math.random() * icons.length)];
+            heart.style.left = Math.random() * 100 + 'vw';
+            heart.style.top = '105vh';
+            
+            const isMobile = window.innerWidth < 768;
+            heart.style.fontSize = Math.random() * (isMobile ? 15 : 20) + 15 + 'px';
+            
+            const duration = Math.random() * 3 + (isMobile ? 4 : 6);
+            heart.style.animationDuration = duration + 's';
+            
+            document.body.appendChild(heart);
+            setTimeout(() => heart.remove(), duration * 1000);
+        }
+
+        createParticles();
+        setInterval(createHeart, 500);
+
+        // Chống zoom khi double tap trên một số trình duyệt mobile
+        document.addEventListener('touchstart', function(event) {
+            if (event.touches.length > 1) event.preventDefault();
+        }, { passive: false });
+    </script>
+</body>
+</html>
