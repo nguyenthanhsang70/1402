@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nhớ Em</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1e3a8a 0%, #312e81 100%);
+            color: #f1f5f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .container {
+            text-align: center;
+            z-index: 10;
+            position: relative;
+        }
+
+        .trigger-btn {
+            padding: 1.1rem 2.8rem;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: white;
+            background: linear-gradient(135deg, #ec4899, #db2777);
+            border: none;
+            border-radius: 9999px;
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(236, 72, 153, 0.35);
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            letter-spacing: 0.5px;
+        }
+
+        .trigger-btn:hover {
+            transform: translateY(-4px) scale(1.04);
+            box-shadow: 0 20px 35px rgba(236, 72, 153, 0.45);
+            background: linear-gradient(135deg, #f472b6, #e11d48);
+        }
+
+        .trigger-btn:active {
+            transform: translateY(-1px) scale(0.98);
+        }
+
+        .trigger-btn.hidden {
+            opacity: 0;
+            transform: scale(0.7);
+            pointer-events: none;
+            transition: all 0.6s ease;
+        }
+
+        .notification-container {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 9999;
+            overflow: hidden;
+        }
+
+        .notification {
+            position: absolute;
+            background: rgba(30, 58, 138, 0.75);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            color: #e0f2fe;
+            padding: 1rem 1.8rem;
+            padding-right: 3.2rem;
+            border-radius: 16px;
+            font-weight: 500;
+            font-size: 1rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            display: flex;
+            align-items: center;
+            animation: fadeInScale 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            white-space: nowrap;
+            pointer-events: auto;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            overflow: hidden;
+        }
+
+        .notification:hover {
+            transform: translateY(-3px) scale(1.03);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+            background: rgba(30, 58, 138, 0.85);
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 50%;
+            right: 1.1rem;
+            transform: translateY(-50%);
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.6);
+            cursor: pointer;
+            line-height: 1;
+            transition: all 0.2s;
+        }
+
+        .close-btn:hover {
+            color: #ffffff;
+            transform: translateY(-50%) scale(1.2);
+        }
+
+        @keyframes fadeInScale {
+            0%   { opacity: 0; transform: scale(0.7) translateY(20px); }
+            70%  { transform: scale(1.06) translateY(-4px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        @keyframes fadeOutScale {
+            0%   { opacity: 1; transform: scale(1); }
+            100% { opacity: 0; transform: scale(0.75) translateY(-30px); }
+        }
+
+        .credit {
+            position: fixed;
+            bottom: 1.2rem;
+            right: 1.8rem;
+            color: rgba(255, 255, 255, 0.45);
+            font-size: 0.82rem;
+            font-weight: 400;
+            letter-spacing: 0.4px;
+            z-index: 5;
+        }
+
+        @media (max-width: 480px) {
+            .trigger-btn {
+                padding: 0.9rem 2.2rem;
+                font-size: 1.1rem;
+            }
+            .notification {
+                font-size: 0.92rem;
+                padding: 0.8rem 1.4rem;
+                padding-right: 2.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <button class="trigger-btn" onclick="spamNotifications()">Nhấn vào đi</button>
+    </div>
+
+    <div class="notification-container" id="notificationContainer"></div>
+
+    <div class="credit">设计由: @阮清尚</div>
+
+    <!-- Nhạc nền -->
+    <audio id="backgroundMusic" loop>
+        <source src="tranngapbonho.mp3" type="audio/mpeg">
+        Trình duyệt không hỗ trợ âm thanh.
+    </audio>
+
+    <script>
+        const messages = [
+            'Nhớ nhớ nhớ em!'
+        ];
+
+        const music = document.getElementById('backgroundMusic');
+
+        function createNotification() {
+            const container = document.getElementById('notificationContainer');
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+
+            const message = messages[Math.floor(Math.random() * messages.length)];
+            notification.innerHTML = `
+                <span>${message}</span>
+                <span class="close-btn">×</span>
+            `;
+
+            container.appendChild(notification);
+
+            const notifWidth = notification.offsetWidth;
+            const notifHeight = notification.offsetHeight;
+
+            const maxX = window.innerWidth - notifWidth - 20;
+            const maxY = window.innerHeight - notifHeight - 20;
+
+            const x = Math.random() * Math.max(0, maxX);
+            const y = Math.random() * Math.max(0, maxY);
+
+            notification.style.left = x + 'px';
+            notification.style.top  = y + 'px';
+
+            const rotation = (Math.random() - 0.5) * 12;
+            notification.style.transform = `rotate(${rotation}deg)`;
+
+            const closeBtn = notification.querySelector('.close-btn');
+            closeBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                notification.style.animation = 'fadeOutScale 0.35s ease-out forwards';
+                setTimeout(() => notification.remove(), 400);
+            });
+
+            notification.addEventListener('click', (e) => {
+                if (e.target !== closeBtn) {
+                    notification.style.animation = 'fadeOutScale 0.35s ease-out forwards';
+                    setTimeout(() => notification.remove(), 400);
+                }
+            });
+        }
+
+        function spamNotifications() {
+            event.target.classList.add('hidden');
+            music.play().catch(() => {}); // tránh lỗi autoplay
+
+            let count = 0;
+            const interval = setInterval(() => {
+                createNotification();
+                count++;
+                if (count >= 600) {
+                    clearInterval(interval);
+                    // Sau khi hoàn tất 600 thông báo → chuyển trang
+                    setTimeout(() => {
+                        window.location.href = "luachon.html";
+                    }, 800); // delay nhẹ 0.8 giây để người dùng thấy hết hiệu ứng cuối
+                }
+            }, 60);
+        }
+    </script>
+</body>
+</html>
