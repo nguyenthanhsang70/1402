@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Messenger Sweet Valentine</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: #ffe4e1;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .chat-container {
+            width: 100%;
+            max-width: 450px;
+            height: 100vh;
+            background: white;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 30px rgba(255, 105, 180, 0.2);
+            position: relative;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            border-bottom: 1px solid rgba(255, 182, 193, 0.3);
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(15px);
+            z-index: 10;
+        }
+
+        .back-button { color: #ff69b4; font-size: 22px; margin-right: 12px; }
+        .profile { display: flex; align-items: center; flex: 1; }
+        .profile-pic { width: 38px; height: 38px; border-radius: 50%; border: 2px solid #ffb6c1; }
+        .profile-info h4 { font-size: 15px; font-weight: 700; color: #d02090; }
+        .profile-info span { font-size: 11px; color: #db7093; }
+        .header-icons { display: flex; gap: 18px; color: #ff69b4; font-size: 18px; }
+
+        /* Messages Area */
+        .messages {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            background-image: url('avatar.jpg');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .messages::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(255, 240, 245, 0.6); 
+            z-index: 0;
+        }
+
+        .message {
+            max-width: 75%;
+            margin-bottom: 8px;
+            padding: 10px 16px;
+            font-size: 15px;
+            line-height: 1.4;
+            position: relative;
+            z-index: 1;
+            opacity: 0; /* Mặc định ẩn để chạy animation */
+            transform: translateY(10px);
+        }
+
+        .received {
+            align-self: flex-start;
+            background: rgba(255, 255, 255, 0.85);
+            color: #4b0082;
+            border-radius: 18px;
+            border-bottom-left-radius: 4px;
+            backdrop-filter: blur(5px);
+        }
+
+        /* Animation tin nhắn */
+        .show-message {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Bottom Bar */
+        .bottom-bar {
+            padding: 10px 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(15px);
+            border-top: 1px solid rgba(255, 182, 193, 0.3);
+        }
+
+        .action-icons { display: flex; gap: 12px; color: #ff69b4; font-size: 20px; }
+        .input-container { flex: 1; background: rgba(255, 192, 203, 0.3); border-radius: 20px; padding: 8px 12px; }
+        .input-container input { border: none; background: transparent; width: 100%; outline: none; color: #c71585; }
+        .heart-button { color: #ff1493; font-size: 24px; }
+
+        /* Hiệu ứng chuyển cảnh mờ dần khi chuyển trang */
+        .fade-out {
+            transition: opacity 1s ease;
+            opacity: 0 !important;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body id="body-content">
+
+<div class="chat-container" id="main-container">
+    <div class="header">
+        <div class="back-button"><i class="fas fa-chevron-left"></i></div>
+        <div class="profile">
+            <div style="position: relative; margin-right: 12px;">
+                <img src="avatar.jpg" alt="Avatar" class="profile-pic">
+            </div>
+            <div class="profile-info">
+                <h4>zài đẹp của em</h4>
+                <span>Đang hoạt động</span>
+            </div>
+        </div>
+        <div class="header-icons">
+            <i class="fas fa-phone-alt"></i>
+            <i class="fas fa-video"></i>
+            <i class="fas fa-info-circle"></i>
+        </div>
+    </div>
+
+    <div class="messages" id="message-list">
+        <div class="message received" data-delay="500">hello bé cưng của a</div>
+        <div class="message received" data-delay="1500">xin lỗi em valentine này a không ở bên cạnh em</div>
+        <div class="message received" data-delay="2500">em đừng buồn nhé</div>
+        <div class="message received" data-delay="3500">anh có một món quà dành cho em nè 🎁</div>
+    </div>
+
+    <div class="bottom-bar">
+        <div class="action-icons">
+            <i class="fas fa-plus-circle"></i>
+            <i class="fas fa-image"></i>
+            <i class="fas fa-microphone"></i>
+        </div>
+        <div class="input-container">
+            <input type="text" placeholder="Gửi tình yêu...">
+        </div>
+        <div class="heart-button">❤️</div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const messages = document.querySelectorAll('.message');
+        const totalMessages = messages.length;
+        let lastDelay = 0;
+
+        // Chạy hiệu ứng xuất hiện cho từng tin nhắn
+        messages.forEach((msg, index) => {
+            const delay = parseInt(msg.getAttribute('data-delay'));
+            lastDelay = Math.max(lastDelay, delay);
+
+            setTimeout(() => {
+                msg.classList.add('show-message');
+            }, delay);
+        });
+
+        // Sau khi tin nhắn cuối cùng hiện lên, đợi thêm 2 giây rồi chuyển trang
+        const redirectDelay = lastDelay + 2500; 
+
+        setTimeout(() => {
+            // Thêm hiệu ứng mờ dần trước khi chuyển
+            document.getElementById('main-container').classList.add('fade-out');
+            
+            setTimeout(() => {
+                // THAY ĐỔI ĐỊA CHỈ TRANG WEB BẠN MUỐN CHUYỂN ĐẾN Ở ĐÂY
+                window.location.href = "qua-tang.html"; 
+            }, 1000);
+        }, redirectDelay);
+    });
+</script>
+
+</body>
+</html>
