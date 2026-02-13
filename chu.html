@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Chòm Sao Vàng</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            overflow: hidden;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            font-family: 'Arial', sans-serif;
+            width: 100vw;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            margin: 0;
+            padding: 0;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            touch-action: none;
+        }
+
+        canvas {
+            display: block;
+            cursor: crosshair;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .text-overlay {
+            position: absolute;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #ffd700;
+            font-size: 20px;
+            text-align: center;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+            letter-spacing: 4px;
+            font-weight: bold;
+            pointer-events: none;
+            z-index: 10;
+            text-transform: uppercase;
+            padding: 0 10px;
+            width: 90%;
+        }
+
+        @media (min-width: 768px) {
+            .text-overlay {
+                font-size: 24px;
+                letter-spacing: 8px;
+                top: 50px;
+            }
+        }
+
+        .instructions {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255, 215, 0, 0.7);
+            font-size: 14px;
+            text-align: center;
+            pointer-events: none;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body>
+    <div class="text-overlay">CHỮ H TỰ ĐỘNG</div>
+    <canvas id="canvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        // Constellation nodes
+        const nodes = [];
+        const particles = [];
+        const maxNodes = 10;
+        let isDragging = false;
+        let currentNode = null;
+
+        class Node {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.radius = 8;
+                this.innerRadius = 4;
+                this.pulsePhase = Math.random() * Math.PI * 2;
+                this.connections = [];
+                this.glowIntensity = 0;
+            }
+
+            draw() {
+                // Pulse effect
+                this.pulsePhase += 0.05;
+                const pulse = Math.sin(this.pulsePhase) * 0.3 + 1;
+                
+                // Outer glow
+                const gradient = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.radius * pulse * 3);
+                gradient.addColorStop(0, 'rgba(255, 215, 0, 0.8)');
+                gradient.addColorStop(0.3, 'rgba(255, 215, 0, 0.4)');
+                gradient.addColorStop(1, 'rgba(255, 215, 0, 0)');
+                
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, Math.abs(this.radius * pulse * 3), 0, Math.PI * 2);
+                ctx.fill();
+
+                // Wireframe sphere effect
+                ctx.strokeStyle = `rgba(255, 215, 0, ${0.6 * pulse})`;
+                ctx.lineWidth = 1.5;
+                
+                // Draw latitude lines
+                for (let i = 0; i < 3; i++) {
+                    const offset = (i - 1) * this.radius * 0.6;
+                    const radiusSquared = this.radius * this.radius - offset * offset;
+                    if (radiusSquared > 0) {
+                        const width = Math.sqrt(radiusSquared) * pulse;
+                        ctx.beginPath();
+                        ctx.ellipse(this.x, this.y + offset, Math.abs(width), Math.abs(width * 0.3), 0, 0, Math.PI * 2);
+                        ctx.stroke();
+                    }
+                }
+                
+                // Draw longitude lines
+                for (let i = 0; i < 4; i++) {
+                    const angle = (i / 4) * Math.PI;
+                    ctx.beginPath();
+                    ctx.ellipse(this.x, this.y, Math.abs(this.radius * pulse * 0.3), Math.abs(this.radius * pulse), angle, 0, Math.PI * 2);
+                    ctx.stroke();
+                }
+
+                // Inner bright core
+                const coreGradient = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.innerRadius * pulse);
+                coreGradient.addColorStop(0, '#fff');
+                coreGradient.addColorStop(0.5, '#ffd700');
+                coreGradient.addColorStop(1, 'rgba(255, 215, 0, 0)');
+                
+                ctx.fillStyle = coreGradient;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, Math.abs(this.innerRadius * pulse * 2), 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            isNear(x, y, distance = 50) {
+                const dx = this.x - x;
+                const dy = this.y - y;
+                return Math.sqrt(dx * dx + dy * dy) < distance;
+            }
+        }
+
+        class Particle {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.vx = (Math.random() - 0.5) * 2;
+                this.vy = (Math.random() - 0.5) * 2;
+                this.life = 1;
+                this.decay = Math.random() * 0.02 + 0.01;
+                this.size = Math.random() * 3 + 1;
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.life -= this.decay;
+                this.vx *= 0.98;
+                this.vy *= 0.98;
+            }
+
+            draw() {
+                ctx.fillStyle = `rgba(255, 215, 0, ${this.life * 0.8})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, Math.abs(this.size * this.life), 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            isDead() {
+                return this.life <= 0;
+            }
+        }
+
+        function drawConnection(node1, node2, progress = 1) {
+            const dx = node2.x - node1.x;
+            const dy = node2.y - node1.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            // Animated gradient line
+            const gradient = ctx.createLinearGradient(node1.x, node1.y, node2.x, node2.y);
+            const time = Date.now() * 0.001;
+            const shimmer = Math.sin(time + distance * 0.01) * 0.3 + 0.7;
+            
+            gradient.addColorStop(0, `rgba(255, 215, 0, ${0.8 * progress * shimmer})`);
+            gradient.addColorStop(0.5, `rgba(255, 223, 0, ${0.9 * progress})`);
+            gradient.addColorStop(1, `rgba(255, 215, 0, ${0.8 * progress * shimmer})`);
+
+            // Outer glow
+            ctx.strokeStyle = `rgba(255, 215, 0, ${0.2 * progress})`;
+            ctx.lineWidth = 6;
+            ctx.beginPath();
+            ctx.moveTo(node1.x, node1.y);
+            ctx.lineTo(node1.x + dx * progress, node1.y + dy * progress);
+            ctx.stroke();
+
+            // Main line
+            ctx.strokeStyle = gradient;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(node1.x, node1.y);
+            ctx.lineTo(node1.x + dx * progress, node1.y + dy * progress);
+            ctx.stroke();
+
+            // Sparkle particles along the line
+            if (Math.random() < 0.1 && progress === 1) {
+                const t = Math.random();
+                const px = node1.x + dx * t;
+                const py = node1.y + dy * t;
+                particles.push(new Particle(px, py));
+            }
+        }
+
+        function drawBackground() {
+            // Ambient stars
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+            for (let i = 0; i < 50; i++) {
+                const x = Math.random() * canvas.width;
+                const y = Math.random() * canvas.height;
+                const size = Math.random() * 2;
+                const twinkle = Math.sin(Date.now() * 0.001 + i) * 0.5 + 0.5;
+                ctx.globalAlpha = twinkle * 0.6;
+                ctx.beginPath();
+                ctx.arc(x, y, size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            ctx.globalAlpha = 1;
+        }
+
+        function animate() {
+            // Fade effect for trails
+            ctx.fillStyle = 'rgba(26, 26, 46, 0.1)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            drawBackground();
+
+            // Update and draw particles
+            for (let i = particles.length - 1; i >= 0; i--) {
+                particles[i].update();
+                particles[i].draw();
+                if (particles[i].isDead()) {
+                    particles.splice(i, 1);
+                }
+            }
+
+            // Draw connections
+            nodes.forEach(node => {
+                node.connections.forEach(connectedNode => {
+                    drawConnection(node, connectedNode);
+                });
+            });
+
+            // Draw nodes
+            nodes.forEach(node => {
+                node.draw();
+            });
+
+            requestAnimationFrame(animate);
+        }
+
+        canvas.addEventListener('mousedown', (e) => {
+            const x = e.clientX;
+            const y = e.clientY;
+
+            // Check if clicking near existing node
+            const nearNode = nodes.find(node => node.isNear(x, y, 30));
+            
+            if (nearNode) {
+                isDragging = true;
+                currentNode = nearNode;
+            } else if (nodes.length < maxNodes) {
+                // Create new node
+                const newNode = new Node(x, y);
+                nodes.push(newNode);
+                
+                // Create spawn particles
+                for (let i = 0; i < 20; i++) {
+                    particles.push(new Particle(x, y));
+                }
+
+                isDragging = true;
+                currentNode = newNode;
+            }
+        });
+
+        canvas.addEventListener('mousemove', (e) => {
+            if (isDragging && currentNode) {
+                const x = e.clientX;
+                const y = e.clientY;
+
+                // Check for nearby nodes to connect
+                nodes.forEach(node => {
+                    if (node !== currentNode && node.isNear(x, y, 80)) {
+                        // Create connection if it doesn't exist
+                        if (!currentNode.connections.includes(node)) {
+                            currentNode.connections.push(node);
+                            
+                            // Create connection particles
+                            for (let i = 0; i < 10; i++) {
+                                const t = Math.random();
+                                const px = currentNode.x + (node.x - currentNode.x) * t;
+                                const py = currentNode.y + (node.y - currentNode.y) * t;
+                                particles.push(new Particle(px, py));
+                            }
+                        }
+                    }
+                });
+            }
+        });
+
+        canvas.addEventListener('mouseup', () => {
+            isDragging = false;
+            currentNode = null;
+        });
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        // Add some initial random stars for ambiance
+        for (let i = 0; i < 100; i++) {
+            setTimeout(() => {
+                particles.push(new Particle(
+                    Math.random() * canvas.width,
+                    Math.random() * canvas.height
+                ));
+            }, i * 50);
+        }
+
+        // Auto-draw letter H
+        function drawLetterH() {
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const scale = Math.min(canvas.width, canvas.height) / 4;
+
+            // Define H shape with nodes
+            const hNodes = [
+                // Left vertical line (top to bottom)
+                { x: centerX - scale * 0.4, y: centerY - scale * 0.6 },
+                { x: centerX - scale * 0.4, y: centerY - scale * 0.3 },
+                { x: centerX - scale * 0.4, y: centerY },
+                { x: centerX - scale * 0.4, y: centerY + scale * 0.3 },
+                { x: centerX - scale * 0.4, y: centerY + scale * 0.6 },
+                
+                // Middle horizontal line (left to right)
+                { x: centerX - scale * 0.2, y: centerY },
+                { x: centerX, y: centerY },
+                { x: centerX + scale * 0.2, y: centerY },
+                
+                // Right vertical line (top to bottom)
+                { x: centerX + scale * 0.4, y: centerY - scale * 0.6 },
+                { x: centerX + scale * 0.4, y: centerY - scale * 0.3 },
+                { x: centerX + scale * 0.4, y: centerY },
+                { x: centerX + scale * 0.4, y: centerY + scale * 0.3 },
+                { x: centerX + scale * 0.4, y: centerY + scale * 0.6 }
+            ];
+
+            // Create nodes with animation delay
+            hNodes.forEach((pos, index) => {
+                setTimeout(() => {
+                    const newNode = new Node(pos.x, pos.y);
+                    nodes.push(newNode);
+                    
+                    // Create spawn particles
+                    for (let i = 0; i < 15; i++) {
+                        particles.push(new Particle(pos.x, pos.y));
+                    }
+                }, index * 150);
+            });
+
+            // Create connections after all nodes are created
+            setTimeout(() => {
+                // Connect left vertical line
+                for (let i = 0; i < 4; i++) {
+                    nodes[i].connections.push(nodes[i + 1]);
+                }
+                
+                // Connect middle horizontal line
+                nodes[2].connections.push(nodes[5]); // Left vertical to middle horizontal
+                nodes[5].connections.push(nodes[6]);
+                nodes[6].connections.push(nodes[7]);
+                nodes[7].connections.push(nodes[10]); // Middle horizontal to right vertical
+                
+                // Connect right vertical line
+                for (let i = 8; i < 12; i++) {
+                    nodes[i].connections.push(nodes[i + 1]);
+                }
+
+                // Add connection particles
+                nodes.forEach(node => {
+                    node.connections.forEach(connectedNode => {
+                        for (let i = 0; i < 10; i++) {
+                            const t = Math.random();
+                            const px = node.x + (connectedNode.x - node.x) * t;
+                            const py = node.y + (connectedNode.y - node.y) * t;
+                            particles.push(new Particle(px, py));
+                        }
+                    });
+                });
+                
+                // Redirect after drawing is complete
+                setTimeout(() => {
+                    window.location.href = 'https://www.google.com'; // Thay đổi URL này thành trang bạn muốn chuyển đến
+                }, 2000); // Đợi 2 giây sau khi vẽ xong mới chuyển trang
+            }, hNodes.length * 150 + 300);
+        }
+
+        // Start drawing H after a short delay
+        setTimeout(drawLetterH, 500);
+
+        animate();
+    </script>
+</body>
+</html>
