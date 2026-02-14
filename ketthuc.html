@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Will you be my Valentine? 💌</title>
+  <title>Valentine</title>
   <style>
     * {
       margin: 0;
@@ -28,7 +28,7 @@
       width: 100%;
       height: 100%;
       pointer-events: none;
-      z-index: 10; /* Để sợi dây hiển thị trên cùng */
+      z-index: 10;
     }
     .wrapper {
       position: relative;
@@ -43,8 +43,8 @@
     }
     .card {
       position: relative;
-      width: 320px;
-      height: 420px;
+      width: 340px;
+      height: 460px;
       background: white;
       border-radius: 20px;
       box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
@@ -53,6 +53,7 @@
       align-items: center;
       justify-content: center;
       overflow: visible;
+      transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
     .card-content {
       padding: 20px;
@@ -61,10 +62,9 @@
       text-align: center;
       z-index: 5;
     }
-    /* Vùng chứa dây kéo */
     .cord-wrapper {
       position: absolute;
-      top: 0; /* Bắt đầu từ mép trên của card */
+      top: 0;
       left: 50%;
       transform: translateX(-50%);
       width: 40px;
@@ -91,21 +91,35 @@
       pointer-events: none;
     }
 
-    /* Styles cho nội dung Valentine */
     h1 { color: #fe3a65; font-size: 24px; margin-bottom: 15px; }
     img { border-radius: 12px; width: 100%; max-width: 260px; margin-bottom: 15px; }
-    .buttons { display: flex; gap: 10px; justify-content: center; margin-top: 10px; }
+    .buttons { 
+      display: flex; 
+      gap: 15px; 
+      justify-content: center; 
+      align-items: center; 
+      margin-top: 10px;
+      min-height: 100px;
+      position: relative;
+      width: 100%;
+    }
     button {
-      padding: 10px 25px;
+      padding: 12px 25px;
       border: none;
       border-radius: 8px;
       cursor: pointer;
       color: white;
       font-weight: bold;
-      transition: 0.3s;
+      transition: background 0.3s;
+      white-space: nowrap;
+      will-change: transform; /* giúp mượt hơn */
     }
-    .yes { background: #4caf50; }
-    .no { background: #f44336; }
+    .yes { background: #4caf50; z-index: 6; }
+    .no { 
+      background: #f44336; 
+      position: relative; 
+      z-index: 5; 
+    }
     .footer-text {
       position: absolute;
       bottom: 15px;
@@ -128,20 +142,15 @@
         <h1>Em có thích bất ngờ này không?</h1>
         <img src="https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExM2Vna2FkeDN2NHYxenduMXVuNTJ0MmJxZjI5dG16bXhoaGJuZmoxMyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/26FLdmIp6wJr91JAI/giphy.gif" alt="please" />
         <div class="buttons">
-          <button class="yes">Có chứ! ❤️</button>
-          <button class="no">Không nha 😜</button>
+          <button class="yes">Có </button>
+          <button class="no">Không </button>
         </div>
       </div>
 
       <div class="valentine-congrats" style="display:none;">
-        <h1>Yêu em nhất! ❤️</h1>
-        <p>Chúc mừng chúng mình có nhau!</p>
+        <h1>Tuyệt vời!</h1>
+        <p>Thay đồ đi tối anh qua chở em đi chơi!</p>
         <img src="https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExd2EwcDRyYXZyNjUwb2h0ZmRnd3R3d2wzMWRvNGR0ejBnMjduaHprYSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/n0IKF3qkeh671VAO45/giphy.gif" />
-      </div>
-
-      <div class="valentine-sad" style="display:none;">
-        <h1>Ơ kìa... dỗi luôn!</h1>
-        <img src="https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExbTF4aHN4Y2FqMnlvdGRwYnF6ZG5nZ2l3emRxeXNvcXlyemZkbDJjYiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/kyrd72DC2Iwfu/giphy.gif" />
       </div>
     </div>
 
@@ -153,7 +162,7 @@
       </svg>
     </div>
   </div>
-  <div class="footer-text">Made with ❤️ by Shrikant • Adapted by Gemini</div>
+  <div class="footer-text">Valentine 2026</div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
@@ -161,11 +170,11 @@
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
 <script>
+// PHYSICS + CORD (giữ nguyên)
 const card = document.querySelector(".card");
 const plug = document.querySelector(".plug");
 const cardRect = card.getBoundingClientRect();
 
-// Matter.js setup
 const engine = Matter.Engine.create();
 const world = engine.world;
 const render = Matter.Render.create({
@@ -179,11 +188,10 @@ const render = Matter.Render.create({
   }
 });
 
-// Tạo các điểm nối cho sợi dây
 const segments = 8;
 const points = [];
 const startX = window.innerWidth / 2;
-const startY = cardRect.top + 10; // Dây bắt đầu từ trong card
+const startY = cardRect.top + 20;
 
 for (let i = 0; i <= segments; i++) {
   const p = Matter.Bodies.circle(startX, startY + i * 15, 2, {
@@ -206,9 +214,9 @@ for (let i = 0; i < points.length - 1; i++) {
 Matter.Runner.run(Matter.Runner.create(), engine);
 Matter.Render.run(render);
 
-// Logic kéo dây
 let isDragging = false;
 const updatePlug = () => {
+  if (!points.length) return;
   const lastPoint = points[points.length - 1].position;
   gsap.set(plug, { 
     x: lastPoint.x - startX, 
@@ -218,18 +226,18 @@ const updatePlug = () => {
 
 function drag(e) {
   if (!isDragging) return;
-  const y = (e.clientY || e.touches[0].clientY);
-  const x = (e.clientX || e.touches[0].clientX);
-  Matter.Body.setPosition(points[points.length - 1], { x, y });
-  
-  // Nếu kéo xuống đủ sâu thì mở card
-  if (y > cardRect.top + 300) openCard();
+  const y = (e.clientY || (e.touches && e.touches[0].clientY));
+  const x = (e.clientX || (e.touches && e.touches[0].clientX));
+  if (points.length) {
+    Matter.Body.setPosition(points[points.length - 1], { x, y });
+  }
+  if (y > cardRect.top + 320) openCard();
 }
 
 plug.addEventListener("mousedown", () => isDragging = true);
-plug.addEventListener("touchstart", () => isDragging = true);
+plug.addEventListener("touchstart", (e) => { isDragging = true; e.preventDefault(); }, {passive: false});
 document.addEventListener("mousemove", drag);
-document.addEventListener("touchmove", drag);
+document.addEventListener("touchmove", drag, {passive: false});
 document.addEventListener("mouseup", () => isDragging = false);
 document.addEventListener("touchend", () => isDragging = false);
 
@@ -241,33 +249,80 @@ function openCard() {
   
   confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
 
-  gsap.to(".text-intro", { opacity: 0, duration: 0.3 });
-  gsap.to(".cord-wrapper", { opacity: 0, duration: 0.5, onComplete: () => {
-    document.querySelector(".cord-wrapper").style.display = "none";
-    points.forEach(p => Matter.World.remove(world, p));
-  }});
+  gsap.to(".cord-wrapper", { 
+    opacity: 0, 
+    duration: 0.3, 
+    onComplete: () => {
+      document.querySelector(".cord-wrapper").style.display = "none";
+      gsap.ticker.remove(updatePlug); 
+      Matter.World.clear(world);
+      Matter.Engine.clear(engine);
+      if (render.canvas) render.canvas.remove();
+    } 
+  });
 
-  gsap.to(".card-content", { display: "block", opacity: 1, duration: 0.8, delay: 0.3 });
+  gsap.to(".text-intro", { opacity: 0, duration: 0.3 });
+  gsap.to(".card", { scale: 1.02, duration: 0.5 });
+  gsap.to(".card-content", { display: "block", opacity: 1, duration: 0.8, delay: 0.2 });
 }
 
-// Nút Yes/No
-document.querySelector(".yes").onclick = () => {
-  gsap.to(".valentine-main", { display: "none", opacity: 0 });
-  gsap.to(".valentine-congrats", { display: "block", opacity: 1 });
-  confetti({ particleCount: 200, spread: 100 });
-};
-
-document.querySelector(".no").onclick = () => {
-  gsap.to(".valentine-main", { display: "none", opacity: 0 });
-  gsap.to(".valentine-sad", { display: "block", opacity: 1 });
-};
-
-// Nút "No" chạy mất khi rê chuột vào
+// ────────────────────────────────────────────────
+// NÚT BẤM – PHIÊN BẢN MƯỢT & SINH ĐỘNG
+const yesBtn = document.querySelector(".yes");
 const noBtn = document.querySelector(".no");
+let runCount = 0;
+let hasDisappeared = false;
+
 noBtn.onmouseover = () => {
-  const x = (Math.random() - 0.5) * 200;
-  const y = (Math.random() - 0.5) * 200;
-  gsap.to(noBtn, { x, y, duration: 0.2 });
+  if (hasDisappeared) return;
+
+  const tl = gsap.timeline({ defaults: { ease: "power3.out", duration: 0.4 } });
+
+  if (runCount < 5) {
+    // 5 lần đầu: di chuyển ngẫu nhiên + xoay nhẹ + scale tí
+    const x = (Math.random() - 0.5) * 220; // giới hạn chặt hơn
+    const y = (Math.random() - 0.5) * 110;
+    const rot = (Math.random() - 0.5) * 20;
+
+    tl.to(noBtn, { x, y, rotation: rot, scale: 1.08 }, 0)
+      .to(noBtn, { scale: 1, rotation: 0, duration: 0.3 }, 0.3);
+
+    runCount++;
+  } else {
+    // Lần 6: bay ra ngoài mượt mà, cong đường, xoay + scale
+    hasDisappeared = true;
+
+    const direction = Math.random() > 0.5 ? 1 : -1;
+    const escapeX = direction * (window.innerWidth * 0.6 + Math.random() * 200);
+    const escapeY = (Math.random() - 0.5) * window.innerHeight * 0.4;
+
+    tl.to(noBtn, {
+      x: escapeX,
+      y: escapeY,
+      rotation: direction * 360,
+      scale: 0.3,
+      opacity: 0,
+      duration: 1.1,
+      ease: "power2.in",
+      onComplete: () => {
+        noBtn.style.visibility = "hidden";
+        noBtn.style.pointerEvents = "none";
+      }
+    });
+  }
+};
+
+yesBtn.onclick = () => {
+  gsap.to(".valentine-main", { display: "none", opacity: 0 });
+  gsap.to(".valentine-congrats", { display: "block", opacity: 1, duration: 0.6, ease: "back.out(1.7)" });
+  confetti({ particleCount: 300, spread: 100, startVelocity: 45 });
+};
+
+noBtn.onclick = () => {
+  // Nếu bấm được thì troll nhẹ
+  gsap.to(noBtn, { scale: 0.1, duration: 0.4, ease: "back.in", onComplete: () => {
+    alert("Haha né mãi vẫn bị bắt nhaaa 😏");
+  }});
 };
 </script>
 </body>
