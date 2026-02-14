@@ -267,20 +267,22 @@ function openCard() {
 }
 
 // ────────────────────────────────────────────────
-// NÚT BẤM – PHIÊN BẢN MƯỢT & SINH ĐỘNG
+// NÚT BẤM – HỖ TRỢ MOBILE (touchstart thay hover)
 const yesBtn = document.querySelector(".yes");
 const noBtn = document.querySelector(".no");
 let runCount = 0;
 let hasDisappeared = false;
 
-noBtn.onmouseover = () => {
+const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+
+// Hàm xử lý "né" (dùng chung cho hover và touch)
+function triggerEscape() {
   if (hasDisappeared) return;
 
   const tl = gsap.timeline({ defaults: { ease: "power3.out", duration: 0.4 } });
 
   if (runCount < 5) {
-    // 5 lần đầu: di chuyển ngẫu nhiên + xoay nhẹ + scale tí
-    const x = (Math.random() - 0.5) * 220; // giới hạn chặt hơn
+    const x = (Math.random() - 0.5) * 220;
     const y = (Math.random() - 0.5) * 110;
     const rot = (Math.random() - 0.5) * 20;
 
@@ -289,7 +291,6 @@ noBtn.onmouseover = () => {
 
     runCount++;
   } else {
-    // Lần 6: bay ra ngoài mượt mà, cong đường, xoay + scale
     hasDisappeared = true;
 
     const direction = Math.random() > 0.5 ? 1 : -1;
@@ -310,19 +311,37 @@ noBtn.onmouseover = () => {
       }
     });
   }
-};
+}
 
+// Desktop: hover
+if (!isTouchDevice) {
+  noBtn.onmouseover = triggerEscape;
+}
+
+// Mobile: touchstart (nhấn để né)
+if (isTouchDevice) {
+  noBtn.addEventListener('touchstart', (e) => {
+    e.preventDefault(); // Ngăn chặn hành vi mặc định (như zoom hoặc scroll)
+    triggerEscape();
+  }, { passive: false });
+}
+
+// Yes button (giữ nguyên)
 yesBtn.onclick = () => {
   gsap.to(".valentine-main", { display: "none", opacity: 0 });
   gsap.to(".valentine-congrats", { display: "block", opacity: 1, duration: 0.6, ease: "back.out(1.7)" });
   confetti({ particleCount: 300, spread: 100, startVelocity: 45 });
 };
 
+// No button onclick (chỉ troll trên desktop, mobile không trigger vì nhấn đã dùng cho né)
 noBtn.onclick = () => {
-  // Nếu bấm được thì troll nhẹ
-  gsap.to(noBtn, { scale: 0.1, duration: 0.4, ease: "back.in", onComplete: () => {
-    alert("Haha né mãi vẫn bị bắt nhaaa 😏");
-  }});
+  // Chỉ chạy nếu không phải touch device (hoặc nếu muốn troll cả mobile thì comment dòng dưới)
+  if (!isTouchDevice) {
+    gsap.to(noBtn, { scale: 0.1, duration: 0.4, ease: "back.in", onComplete: () => {
+      alert("Haha né mãi vẫn bị bắt nhaaa 😏");
+    }});
+  }
+  // Trên mobile: không làm gì vì touchstart đã xử lý né
 };
 </script>
 </body>
