@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>I Love You</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            overflow: hidden;
+            background: #000;
+            font-family: 'Arial', sans-serif;
+            width: 100vw;
+            height: 100vh;
+            position: fixed;
+            touch-action: none;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        canvas {
+            display: block;
+            background: radial-gradient(ellipse at center, #1a1a3e 0%, #000000 100%);
+            width: 100%;
+            height: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+        }
+
+        .title {
+            position: absolute;
+            top: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: clamp(2rem, 8vw, 4rem);
+            font-weight: bold;
+            color: #6eb5ff;
+            text-shadow: 0 0 20px #6eb5ff, 0 0 40px #6eb5ff, 0 0 60px #6eb5ff;
+            font-style: italic;
+            z-index: 10;
+            animation: glow 2s ease-in-out infinite alternate;
+            white-space: nowrap;
+            padding: 0 20px;
+        }
+
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 20px #6eb5ff, 0 0 40px #6eb5ff, 0 0 60px #6eb5ff;
+            }
+            to {
+                text-shadow: 0 0 30px #6eb5ff, 0 0 60px #6eb5ff, 0 0 90px #6eb5ff, 0 0 120px #3d8fff;
+            }
+        }
+
+
+    </style>
+</head>
+<body>
+    <div class="title">I Love You</div>
+    
+    <canvas id="canvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        class Particle {
+            constructor(x, y, targetX, targetY) {
+                this.x = x;
+                this.y = y;
+                this.targetX = targetX;
+                this.targetY = targetY;
+                this.size = Math.random() * 2 + 1;
+                this.speedX = 0;
+                this.speedY = 0;
+                this.color = `hsl(${200 + Math.random() * 60}, 100%, ${50 + Math.random() * 30}%)`;
+                this.delay = Math.random() * 100;
+                this.counter = 0;
+            }
+
+            update() {
+                if (this.counter < this.delay) {
+                    this.counter++;
+                    return;
+                }
+
+                const dx = this.targetX - this.x;
+                const dy = this.targetY - this.y;
+                
+                this.speedX = dx * 0.05;
+                this.speedY = dy * 0.05;
+                
+                this.x += this.speedX;
+                this.y += this.speedY;
+
+                // Add some floating effect
+                this.x += Math.sin(Date.now() * 0.001 + this.x * 0.01) * 0.5;
+                this.y += Math.cos(Date.now() * 0.001 + this.y * 0.01) * 0.3;
+            }
+
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            }
+        }
+
+        // Create heart shape points
+        function createHeartShape(centerX, centerY, size) {
+            const points = [];
+            // Adjust number of points based on device
+            const isMobile = window.innerWidth < 768;
+            const numPoints = isMobile ? 200 : 300;
+            
+            for (let i = 0; i < numPoints; i++) {
+                const t = (i / numPoints) * Math.PI * 2;
+                
+                // Heart equation
+                const x = size * 16 * Math.pow(Math.sin(t), 3);
+                const y = -size * (13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
+                
+                points.push({
+                    x: centerX + x,
+                    y: centerY + y
+                });
+            }
+            
+            return points;
+        }
+
+        // Initialize particles
+        const heartSize = Math.min(canvas.width, canvas.height) / 80;
+        const heartPoints = createHeartShape(canvas.width / 2, canvas.height / 2, heartSize);
+        const particles = [];
+
+        heartPoints.forEach(point => {
+            // Start particles from random positions
+            const startX = Math.random() * canvas.width;
+            const startY = Math.random() * canvas.height;
+            particles.push(new Particle(startX, startY, point.x, point.y));
+        });
+
+        // Create stars in background
+        class Star {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2;
+                this.speed = Math.random() * 0.5 + 0.1;
+                this.opacity = Math.random();
+            }
+
+            update() {
+                this.opacity += this.speed * 0.01;
+                if (this.opacity > 1 || this.opacity < 0) {
+                    this.speed *= -1;
+                }
+            }
+
+            draw() {
+                ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        const stars = [];
+        const numStars = window.innerWidth < 768 ? 50 : 100;
+        for (let i = 0; i < numStars; i++) {
+            stars.push(new Star());
+        }
+
+        // Animation loop
+        function animate() {
+            ctx.fillStyle = 'rgba(0, 0, 10, 0.1)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Draw stars
+            stars.forEach(star => {
+                star.update();
+                star.draw();
+            });
+
+            // Draw particles
+            particles.forEach(particle => {
+                particle.update();
+                particle.draw();
+            });
+
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            const newHeartSize = Math.min(canvas.width, canvas.height) / 80;
+            const newHeartPoints = createHeartShape(canvas.width / 2, canvas.height / 2, newHeartSize);
+            particles.forEach((particle, index) => {
+                if (newHeartPoints[index]) {
+                    particle.targetX = newHeartPoints[index].x;
+                    particle.targetY = newHeartPoints[index].y;
+                }
+            });
+        });
+
+        // Add glow effect on platform bottom
+        function drawPlatform() {
+            const platformY = canvas.height / 2 + 200;
+            const gradient = ctx.createRadialGradient(
+                canvas.width / 2, platformY,
+                0,
+                canvas.width / 2, platformY,
+                200
+            );
+            gradient.addColorStop(0, 'rgba(110, 181, 255, 0.3)');
+            gradient.addColorStop(1, 'transparent');
+            
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, platformY - 20, canvas.width, 40);
+        }
+
+        // Enhanced animation with platform
+        function animateEnhanced() {
+            ctx.fillStyle = 'rgba(0, 0, 10, 0.15)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            drawPlatform();
+
+            stars.forEach(star => {
+                star.update();
+                star.draw();
+            });
+
+            particles.forEach(particle => {
+                particle.update();
+                particle.draw();
+            });
+
+            requestAnimationFrame(animateEnhanced);
+        }
+
+        animateEnhanced();
+
+        // Auto redirect to luachon.html after 8 seconds (after heart forms)
+        setTimeout(() => {
+            window.location.href = 'luachon.html';
+        }, 8000);
+    </script>
+</body>
+</html>
